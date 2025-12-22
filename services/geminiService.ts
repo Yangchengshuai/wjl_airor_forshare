@@ -64,7 +64,7 @@ export const getAIAnalysis = async (inputs: ProjectInputs, results: CalculationR
     3. **优化建议：** 给出 3 条具体的改进 ROI 的建议（例如：通过 SOP 标准化降低研发人月，或谈判降低外部采购 CAPEX）。
     4. **what-if：** 给出3~4个**使得项目三年ROI为正的what-if条件，可以是多条件组合。（例如：如果你将产研人数从12人月降低至6人月，你将获得3年期ROI为64.7%，那么我将可以通过该项目）
 
-    请使用 Markdown 格式输出。风格要直接、客观、数据驱动。
+    请使用 Markdown格式输出，不要使用表格等复杂结构。风格要直接、客观、数据驱动。
   `;
 
   try {
