@@ -1,7 +1,8 @@
+
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { Assessment } from '../types';
-import { Plus, FileText, Calendar, ChevronRight, LogOut, Loader2, WifiOff } from 'lucide-react';
+import { Plus, FileText, Calendar, ChevronRight, LogOut, Loader2, WifiOff, Calculator } from 'lucide-react';
 
 interface DashboardProps {
   onSelectAssessment: (assessment: Assessment) => void;
@@ -42,7 +43,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectAssessment, onNewA
     if (!isOffline) {
       await supabase.auth.signOut();
     } else {
-      window.location.reload(); // Simple reload to reset offline session state in App
+      window.location.reload(); 
     }
   };
 
@@ -50,21 +51,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectAssessment, onNewA
     <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-800">我的评估项目</h1>
+          <div className="flex items-center gap-3">
+            <div className="bg-teal-600 p-1.5 rounded-lg">
+              <Calculator className="w-4 h-4 text-white" />
+            </div>
+            <div className="hidden sm:block">
+              <h1 className="text-sm font-bold text-slate-800 leading-tight">AI项目ROI 评估助手</h1>
+              <p className="text-[10px] font-bold text-teal-600 uppercase tracking-wider leading-none">系统与数据</p>
+            </div>
             {isOffline && (
-              <span className="bg-slate-100 text-slate-500 text-xs px-2 py-0.5 rounded border border-slate-200 flex items-center gap-1">
+              <span className="bg-slate-100 text-slate-500 text-xs px-2 py-0.5 rounded border border-slate-200 flex items-center gap-1 ml-2">
                 <WifiOff className="w-3 h-3" />
-                离线模式
+                演示模式
               </span>
             )}
           </div>
           <button 
             onClick={handleSignOut}
-            className="text-sm text-slate-500 hover:text-slate-800 flex items-center gap-1"
+            className="text-sm text-slate-500 hover:text-slate-800 flex items-center gap-1 p-2 hover:bg-slate-50 rounded-lg transition-colors"
           >
             <LogOut className="w-4 h-4" />
-            {isOffline ? '重置' : '退出'}
+            <span className="hidden sm:inline">{isOffline ? '重置' : '退出'}</span>
           </button>
         </div>
       </header>
@@ -93,8 +100,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectAssessment, onNewA
             <h3 className="text-lg font-medium text-slate-900">暂无项目</h3>
             <p className="text-slate-500 mt-1 mb-6">
               {isOffline 
-                ? '离线模式下无法保存或查看历史项目。但您可以创建新的临时评估。' 
-                : '创建一个新的 AI 投资 ROI 评估模型。'}
+                ? '演示模式下无法持久保存项目。您可以创建临时的评估模型。' 
+                : '开始您的第一个 AI 投资回报率评估。'}
             </p>
             <button
               onClick={onNewAssessment}
