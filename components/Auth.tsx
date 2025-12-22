@@ -25,7 +25,7 @@ export const Auth: React.FC<AuthProps> = ({ onEnterOfflineMode }) => {
       });
       if (error) throw error;
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || '认证失败，请检查内部账号信息' });
+      setMessage({ type: 'error', text: error.message || '认证失败，请检查账号信息' });
     } finally {
       setLoading(false);
     }
@@ -64,18 +64,14 @@ export const Auth: React.FC<AuthProps> = ({ onEnterOfflineMode }) => {
           </div>
           <div className="text-center">
             <h1 className="text-xl font-bold text-slate-800 uppercase tracking-tight">AI项目ROI 评估助手</h1>
-            <p className="text-xs font-semibold text-teal-600 uppercase tracking-widest mt-1">系统与数据</p>
+            <p className="text-xs font-bold text-teal-600 uppercase tracking-widest mt-1">系统与数据</p>
           </div>
         </div>
 
         <div className="bg-amber-50 border border-amber-100 p-3 rounded-lg mb-6 flex items-center gap-2 text-amber-800 text-xs">
           <ShieldCheck className="w-4 h-4 shrink-0" />
-          <span>内部系统：仅限授权员工登录使用。</span>
+          <span>仅限授权访问。</span>
         </div>
-
-        <h2 className="text-lg font-bold text-slate-800 mb-6 text-center">
-          企业内部登录
-        </h2>
 
         {message && (
           <div className={`p-4 rounded-lg mb-6 flex items-start gap-3 text-sm ${
@@ -88,14 +84,14 @@ export const Auth: React.FC<AuthProps> = ({ onEnterOfflineMode }) => {
 
         <form onSubmit={handleAuth} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">内部邮箱</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">邮箱</label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
               <input
                 type="email"
                 required
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
-                placeholder="staff@company.com"
+                placeholder="name@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -103,7 +99,7 @@ export const Auth: React.FC<AuthProps> = ({ onEnterOfflineMode }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">访问密码</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">密码</label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
               <input
@@ -125,17 +121,17 @@ export const Auth: React.FC<AuthProps> = ({ onEnterOfflineMode }) => {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                身份验证中...
+                正在登录...
               </>
             ) : (
-              '验证并进入系统'
+              '登录'
             )}
           </button>
         </form>
 
         <div className="mt-8 pt-6 border-t border-slate-100 text-center">
           <p className="text-xs text-slate-400">
-            如果您无法访问，请联系系统管理员或数据中心团队。
+            如果您无法访问，请联系SSC系统与数据团队。
           </p>
         </div>
       </div>
