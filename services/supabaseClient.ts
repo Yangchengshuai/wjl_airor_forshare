@@ -1,7 +1,32 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
+// Helper to safely get environment variables in various environments (Vite, CRA, Node)
+const getEnv = (key: string) => {
+  try {
+    // @ts-ignore - Handle Vite's import.meta.env
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
+      // @ts-ignore
+      return import.meta.env[key];
+    }
+  } catch (e) {
+    // Ignore errors accessing import.meta
+  }
+
+  try {
+    // Handle standard process.env (Node/CRA)
+    // We check typeof process to avoid "ReferenceError: process is not defined" in browser
+    if (typeof process !== 'undefined' && process.env && process.env[key]) {
+      return process.env[key];
+    }
+  } catch (e) {
+    // Ignore errors accessing process
+  }
+
+  return '';
+};
+
+const supabaseUrl = getEnv('VITE_SUPABASE_URL');
+const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY');
 
 export const isSupabaseConfigured = !!supabaseUrl && !!supabaseAnonKey && supabaseUrl !== 'undefined' && supabaseAnonKey !== 'undefined';
 

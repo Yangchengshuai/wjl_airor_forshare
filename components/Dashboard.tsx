@@ -1,20 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { Assessment } from '../types';
-import { Plus, FileText, Calendar, ChevronRight, LogOut, Loader2 } from 'lucide-react';
+import { Plus, FileText, Calendar, ChevronRight, LogOut, Loader2, WifiOff } from 'lucide-react';
 
 interface DashboardProps {
   onSelectAssessment: (assessment: Assessment) => void;
   onNewAssessment: () => void;
+  isOffline?: boolean;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ onSelectAssessment, onNewAssessment }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ onSelectAssessment, onNewAssessment, isOffline = false }) => {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isOffline) {
+      setLoading(false);
+      setAssessments([]);
+      return;
+    }
     fetchAssessments();
-  }, []);
+  }, [isOffline]);
 
   const fetchAssessments = async () => {
     try {
@@ -33,20 +39,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectAssessment, onNewA
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    if (!isOffline) {
+      await supabase.auth.signOut();
+    } else {
+      window.location.reload(); // Simple reload to reset offline session state in App
+    }
   };
 
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-slate-800">我的评估项目</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-slate-800">我的评估项目</h1>
+            {isOffline && (
+              <span className="bg-slate-100 text-slate-500 text-xs px-2 py-0.5 rounded border border-slate-200 flex items-center gap-1">
+                <WifiOff className="w-3 h-3" />
+                离线模式
+              </span>
+            )}
+          </div>
           <button 
             onClick={handleSignOut}
             className="text-sm text-slate-500 hover:text-slate-800 flex items-center gap-1"
           >
             <LogOut className="w-4 h-4" />
-            退出
+            {isOffline ? '重置' : '退出'}
           </button>
         </div>
       </header>
@@ -73,7 +91,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectAssessment, onNewA
               <FileText className="w-8 h-8 text-slate-400" />
             </div>
             <h3 className="text-lg font-medium text-slate-900">暂无项目</h3>
-            <p className="text-slate-500 mt-1 mb-6">创建一个新的 AI 投资 ROI 评估模型。</p>
+            <p className="text-slate-500 mt-1 mb-6">
+              {isOffline 
+                ? '离线模式下无法保存或查看历史项目。但您可以创建新的临时评估。' 
+                : '创建一个新的 AI 投资 ROI 评估模型。'}
+            </p>
             <button
               onClick={onNewAssessment}
               className="text-teal-600 font-medium hover:underline"

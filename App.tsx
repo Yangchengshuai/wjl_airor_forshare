@@ -11,9 +11,10 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<'dashboard' | 'calculator'>('dashboard');
   const [currentAssessment, setCurrentAssessment] = useState<Assessment | null>(null);
+  const [isOfflineSession, setIsOfflineSession] = useState(false);
 
   useEffect(() => {
-    // If Supabase is not configured, skip authentication check
+    // If Supabase is not configured, we stop loading and wait for user interaction in Auth component
     if (!isSupabaseConfigured) {
       setLoading(false);
       return;
@@ -41,18 +42,9 @@ const App: React.FC = () => {
     );
   }
 
-  // Offline Mode: Directly show Calculator if Supabase is not configured
-  if (!isSupabaseConfigured) {
-    return (
-      <CalculatorView 
-        initialAssessment={null} 
-        onBack={() => {}} // No navigation in offline mode
-      />
-    );
-  }
-
-  if (!session) {
-    return <Auth />;
+  // Show Auth if no session (and not in offline override mode)
+  if (!session && !isOfflineSession) {
+    return <Auth onEnterOfflineMode={() => setIsOfflineSession(true)} />;
   }
 
   // Router Logic
@@ -70,6 +62,7 @@ const App: React.FC = () => {
 
   return (
     <Dashboard
+      isOffline={isOfflineSession || !isSupabaseConfigured}
       onNewAssessment={() => {
         setCurrentAssessment(null);
         setCurrentView('calculator');
