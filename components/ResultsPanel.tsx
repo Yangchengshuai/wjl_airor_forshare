@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState } from 'react';
 import { CalculationResult, ProjectInputs, ChartDataPoint } from '../types';
 import { getAIAnalysis } from '../services/geminiService';
@@ -8,10 +9,11 @@ import { Sparkles, TrendingUp, RefreshCw, Calculator, ArrowRight } from 'lucide-
 interface ResultsPanelProps {
   results: CalculationResult;
   inputs: ProjectInputs;
+  aiAdvice: string;
+  onUpdateAdvice: (advice: string) => void;
 }
 
-export const ResultsPanel: React.FC<ResultsPanelProps> = ({ results, inputs }) => {
-  const [aiAdvice, setAiAdvice] = useState<string>("");
+export const ResultsPanel: React.FC<ResultsPanelProps> = ({ results, inputs, aiAdvice, onUpdateAdvice }) => {
   const [loadingAi, setLoadingAi] = useState<boolean>(false);
 
   const chartData = useMemo<ChartDataPoint[]>(() => {
@@ -36,7 +38,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({ results, inputs }) =
   const handleGenerateAdvice = async () => {
     setLoadingAi(true);
     const advice = await getAIAnalysis(inputs, results);
-    setAiAdvice(advice);
+    onUpdateAdvice(advice);
     setLoadingAi(false);
   };
 
@@ -206,7 +208,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({ results, inputs }) =
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                生成评估报告
+                {aiAdvice ? '刷新评估报告' : '生成评估报告'}
               </>
             )}
           </button>

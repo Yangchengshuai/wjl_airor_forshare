@@ -1,3 +1,4 @@
+
 export interface ProjectInputs {
   background: string;
   monthlyHours: number; // 节省工时
@@ -37,4 +38,5 @@ export interface Assessment {
   created_at: string;
   updated_at: string;
   inputs: ProjectInputs;
+  ai_analysis?: string; // Persisted AI Analysis
 }

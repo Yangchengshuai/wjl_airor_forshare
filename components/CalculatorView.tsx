@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { InputSection } from './InputSection';
 import { ResultsPanel } from './ResultsPanel';
@@ -11,6 +12,7 @@ interface CalculatorViewProps {
 }
 
 export const CalculatorView: React.FC<CalculatorViewProps> = ({ initialAssessment, onBack }) => {
+  const [currentId, setCurrentId] = useState<string | null>(initialAssessment?.id || null);
   const [name, setName] = useState(initialAssessment?.name || '未命名评估项目');
   
   // Default Inputs
@@ -27,6 +29,9 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({ initialAssessmen
   const [inputs, setInputs] = useState<ProjectInputs>(
     initialAssessment?.inputs || defaultInputs
   );
+
+  // Lifted state for AI Analysis to allow persistence
+  const [aiAnalysis, setAiAnalysis] = useState<string>(initialAssessment?.ai_analysis || '');
 
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -84,27 +89,31 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({ initialAssessmen
       const payload = {
         name,
         inputs,
+        ai_analysis: aiAnalysis, // Save the AI text
         user_id: user.id,
         updated_at: new Date().toISOString(),
       };
 
       let error;
-      if (initialAssessment?.id) {
-        // Update
+      if (currentId) {
+        // Update existing record
         const res = await supabase
           .from('assessments')
           .update(payload)
-          .eq('id', initialAssessment.id);
+          .eq('id', currentId);
         error = res.error;
       } else {
-        // Create (Upsert to handle "Create New" flow turning into "Edit" flow)
-        // Actually, let's just insert. But to update the view state we would need the ID back.
-        // For simplicity, we just insert and if they save again, we should technically update.
-        // However, since we don't update parent state with ID here easily without callback:
-        const res = await supabase.from('assessments').insert(payload).select();
+        // Create new record
+        const res = await supabase
+          .from('assessments')
+          .insert(payload)
+          .select()
+          .single();
+        
+        if (res.data) {
+          setCurrentId(res.data.id); // Update ID so subsequent saves are updates
+        }
         error = res.error;
-        // In a real app we'd update the current ID so subsequent saves are updates.
-        // For now, we will just save.
       }
 
       if (error) throw error;
@@ -191,7 +200,12 @@ export const CalculatorView: React.FC<CalculatorViewProps> = ({ initialAssessmen
 
           {/* Right Column: Results */}
           <div className="lg:col-span-8">
-            <ResultsPanel results={results} inputs={inputs} />
+            <ResultsPanel 
+              results={results} 
+              inputs={inputs} 
+              aiAdvice={aiAnalysis}
+              onUpdateAdvice={setAiAnalysis}
+            />
           </div>
         </div>
       </main>

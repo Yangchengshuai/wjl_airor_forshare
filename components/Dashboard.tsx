@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { Assessment } from '../types';
-import { Plus, FileText, Calendar, ChevronRight, LogOut, Loader2, WifiOff, Calculator } from 'lucide-react';
+import { Plus, FileText, Calendar, ChevronRight, LogOut, Loader2, WifiOff, Calculator, Copy, Trash2 } from 'lucide-react';
 
 interface DashboardProps {
   onSelectAssessment: (assessment: Assessment) => void;
@@ -13,6 +13,7 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ onSelectAssessment, onNewAssessment, isOffline = false }) => {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null); // Stores ID of item currently being acted on
 
   useEffect(() => {
     if (isOffline) {
@@ -44,6 +45,56 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectAssessment, onNewA
       await supabase.auth.signOut();
     } else {
       window.location.reload(); 
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!confirm('确定要删除这个项目吗？此操作无法撤销。')) return;
+
+    setActionLoading(id);
+    try {
+      const { error } = await supabase.from('assessments').delete().eq('id', id);
+      if (error) throw error;
+      setAssessments(prev => prev.filter(item => item.id !== id));
+    } catch (error) {
+      console.error('Delete failed:', error);
+      alert('删除失败');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDuplicate = async (e: React.MouseEvent, assessment: Assessment) => {
+    e.stopPropagation();
+    setActionLoading(assessment.id);
+
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) throw new Error("No user");
+
+      const newName = `${assessment.name} (副本)`;
+      const { data, error } = await supabase
+        .from('assessments')
+        .insert({
+          user_id: user.id,
+          name: newName,
+          inputs: assessment.inputs,
+          ai_analysis: assessment.ai_analysis,
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setAssessments(prev => [data, ...prev]);
+      }
+    } catch (error) {
+      console.error('Duplicate failed:', error);
+      alert('复制失败');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -116,7 +167,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectAssessment, onNewA
               <div 
                 key={assessment.id}
                 onClick={() => onSelectAssessment(assessment)}
-                className="bg-white p-6 rounded-xl border border-slate-200 hover:border-teal-400 hover:shadow-md transition-all cursor-pointer group"
+                className="bg-white p-6 rounded-xl border border-slate-200 hover:border-teal-400 hover:shadow-md transition-all cursor-pointer group relative"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="bg-teal-50 p-2 rounded-lg">
@@ -127,14 +178,36 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectAssessment, onNewA
                 <h3 className="font-bold text-slate-800 mb-2 truncate pr-2" title={assessment.name}>
                   {assessment.name}
                 </h3>
-                <div className="flex items-center gap-2 text-xs text-slate-400">
+                <div className="flex items-center gap-2 text-xs text-slate-400 mb-4">
                   <Calendar className="w-3 h-3" />
                   {new Date(assessment.updated_at).toLocaleDateString()}
                 </div>
                 {assessment.inputs && (
-                    <p className="mt-4 text-xs text-slate-500 line-clamp-2 h-8">
+                    <p className="text-xs text-slate-500 line-clamp-2 h-8 mb-4">
                         {assessment.inputs.background || "无背景描述..."}
                     </p>
+                )}
+                
+                {/* Actions */}
+                {!isOffline && (
+                  <div className="flex items-center justify-end gap-2 border-t border-slate-100 pt-3">
+                    <button
+                      onClick={(e) => handleDuplicate(e, assessment)}
+                      disabled={actionLoading === assessment.id}
+                      className="p-2 text-slate-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
+                      title="复制项目"
+                    >
+                      {actionLoading === assessment.id ? <Loader2 className="w-4 h-4 animate-spin"/> : <Copy className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={(e) => handleDelete(e, assessment.id)}
+                      disabled={actionLoading === assessment.id}
+                      className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="删除项目"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 )}
               </div>
             ))}
