@@ -1,0 +1,51 @@
+import { GoogleGenAI } from "@google/genai";
+import { ProjectInputs, CalculationResult } from "../types";
+
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+export const getAIAnalysis = async (inputs: ProjectInputs, results: CalculationResult): Promise<string> => {
+  const prompt = `
+    你是一位高级 AI 投资顾问兼 CFO。请基于以下最新的财务模型分析该 AI 项目提案：
+
+    **1. 业务价值估算：**
+    - 项目背景：${inputs.background || "未提供描述"}
+    - 目标岗位（HR运营）月薪：¥${inputs.hrMonthlySalary.toLocaleString()}
+    - 每月节省工时：${inputs.monthlyHours} 小时
+    - **折算月度收益：¥${results.monthlyBenefit.toLocaleString()}** (基于时薪折算)
+
+    **2. 成本结构分析：**
+    - **初始投入 (一次性)：¥${results.totalInitialInvestment.toLocaleString()}**
+      - 其中产研投入：${inputs.devManMonths} 人月 × ¥${(inputs.devManMonthCostWan * 10000).toLocaleString()}/月
+      - 其中 CAPEX (外部采购)：¥${(inputs.capexWan * 10000).toLocaleString()}
+    - **运营支出 (OPEX)：¥${(inputs.opexYearlyWan * 10000).toLocaleString()}/年** (即 ¥${results.monthlyOpex.toLocaleString()}/月)
+
+    **3. 财务指标预测 (3年期)：**
+    - **月度净现金流：¥${results.monthlyNetFlow.toLocaleString()}**
+    - **回本周期：${results.breakEvenMonth ? `${results.breakEvenMonth} 个月` : '3年内无法回本'}**
+    - 3年期 ROI：${results.roiPercent.toFixed(1)}%
+    - 3年期净利润：¥${results.threeYearNetProfit.toLocaleString()}
+
+    **任务：**
+    请提供一份简明扼要、专业的评估意见（请使用中文回答）。
+    1. **投资结论：** 这是一个值得投入的项目吗？（强烈推荐/推荐/谨慎/不推荐）
+    2. **风险提示：** 重点关注 OPEX 占比和研发人月投入是否合理。
+    3. **优化建议：** 给出 3 条具体的改进 ROI 的建议（例如：通过 SOP 标准化降低研发人月，或谈判降低外部采购 CAPEX）。
+
+    请使用 Markdown 格式输出。风格要直接、客观、数据驱动。
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+      config: {
+        thinkingConfig: { thinkingBudget: 0 } 
+      }
+    });
+
+    return response.text || "暂时无法生成分析。";
+  } catch (error) {
+    console.error("Error fetching AI analysis:", error);
+    return "生成 AI 分析时出错。请检查您的 API 密钥或稍后重试。";
+  }
+};
