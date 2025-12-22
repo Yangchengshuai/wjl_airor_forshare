@@ -1,9 +1,41 @@
 import { GoogleGenAI } from "@google/genai";
 import { ProjectInputs, CalculationResult } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Helper to safely get environment variables without crashing in browser
+const getApiKey = () => {
+  try {
+    // Check for Vite environment variables (VITE_ prefix is standard for exposed vars)
+    // @ts-ignore
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
+      // @ts-ignore
+      return import.meta.env.VITE_API_KEY;
+    }
+  } catch (e) {
+    // Ignore errors
+  }
+
+  try {
+    // Check for standard process.env (Node.js or polyfilled environments)
+    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+      return process.env.API_KEY;
+    }
+  } catch (e) {
+    // Ignore errors
+  }
+
+  return '';
+};
+
+// Initialize with a safe key (empty string if missing) to prevent startup crash.
+// Calls will fail gracefully inside the function if key is invalid.
+const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
 export const getAIAnalysis = async (inputs: ProjectInputs, results: CalculationResult): Promise<string> => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    return "API Key 未配置。请在 Vercel 环境变量中设置 VITE_API_KEY (推荐) 或 API_KEY。";
+  }
+
   const prompt = `
     你是一位高级 AI 投资顾问兼 CFO。请基于以下最新的财务模型分析该 AI 项目提案：
 
@@ -46,6 +78,6 @@ export const getAIAnalysis = async (inputs: ProjectInputs, results: CalculationR
     return response.text || "暂时无法生成分析。";
   } catch (error) {
     console.error("Error fetching AI analysis:", error);
-    return "生成 AI 分析时出错。请检查您的 API 密钥或稍后重试。";
+    return "生成 AI 分析时出错。请检查您的 API 密钥配置。";
   }
 };
