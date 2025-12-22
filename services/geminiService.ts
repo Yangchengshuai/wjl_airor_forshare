@@ -37,7 +37,7 @@ export const getAIAnalysis = async (inputs: ProjectInputs, results: CalculationR
   }
 
   const prompt = `
-    你是一位高级 AI 投资顾问兼 CFO。请基于以下最新的财务模型分析该 AI 项目提案：
+    你是一位高级 AI 投资顾问兼业务线“CFO”（当前支持公司的HR业务线）。今天，公司的HR+AI创新业务团队，承报了如下项目规划数据，请基于以下最新的财务模型分析该 AI 项目提案：
 
     **1. 业务价值估算：**
     - 项目背景：${inputs.background || "未提供描述"}
