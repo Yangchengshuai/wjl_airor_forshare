@@ -12,9 +12,67 @@ View your app in AI Studio: https://ai.studio/apps/drive/1x0mgWg-6UEZRphCtFffNmB
 
 **Prerequisites:**  Node.js
 
-
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+   ```bash
+   npm install
+   ```
+
+2. Create a `.env.local` file with the following variables:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_API_KEY=your_gemini_api_key
+   ```
+   See [.env.example](.env.example) for reference.
+
 3. Run the app:
-   `npm run dev`
+   ```bash
+   npm run dev
+   ```
+
+## Deployment
+
+This app is deployed on **Vercel** with **Supabase** as the backend.
+
+### Quick Start
+
+1. **Supabase Setup**: See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for detailed instructions
+   - Project Ref: `qgzgjbyazgmghgjqwkzi`
+   - Execute database migrations from `supabase/migrations/`
+
+2. **Vercel Configuration**:
+   - Project is already configured: `airoi_forshare`
+   - Add environment variables in Vercel Dashboard:
+     - `VITE_SUPABASE_URL`
+     - `VITE_SUPABASE_ANON_KEY`
+     - `VITE_API_KEY`
+
+3. **Deploy**:
+   - Automatic: Push to `main` branch (if GitHub is connected)
+   - Manual: Run `vercel --prod`
+
+For complete deployment instructions, see [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md).
+
+## Project Structure
+
+```
+airoi_forshare/
+├── components/          # React components
+├── services/            # Supabase client and Gemini service
+├── supabase/
+│   └── migrations/     # Database migration files
+├── types.ts            # TypeScript type definitions
+└── vite.config.ts      # Vite configuration
+```
+
+## Features
+
+- ✅ User authentication (Supabase Auth)
+- ✅ AI ROI assessment calculator
+- ✅ Google Gemini AI analysis
+- ✅ Data persistence (Supabase PostgreSQL)
+- ✅ Row Level Security (RLS) for data protection
+
+## Troubleshooting
+
+See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md#故障排查) for common issues and solutions.
