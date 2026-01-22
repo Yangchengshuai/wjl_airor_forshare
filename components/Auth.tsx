@@ -12,6 +12,7 @@ export const Auth: React.FC<AuthProps> = ({ onEnterOfflineMode }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
+  const [isLogin, setIsLogin] = useState(true); // 新增：切换登录/注册模式
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,11 +20,34 @@ export const Auth: React.FC<AuthProps> = ({ onEnterOfflineMode }) => {
     setMessage(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
+      if (isLogin) {
+        // 登录
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+      } else {
+        // 注册
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (error) throw error;
+
+        // 检查是否需要邮件确认
+        if (data.user && !data.session) {
+          setMessage({
+            type: 'success',
+            text: '注册成功！请检查您的邮箱并点击确认链接。'
+          });
+        } else if (data.session) {
+          setMessage({
+            type: 'success',
+            text: '注册成功！正在跳转...'
+          });
+        }
+      }
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message || '认证失败，请检查账号信息' });
     } finally {
@@ -105,8 +129,9 @@ export const Auth: React.FC<AuthProps> = ({ onEnterOfflineMode }) => {
               <input
                 type="password"
                 required
+                minLength={6}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
-                placeholder="••••••••"
+                placeholder="••••••••（至少6位）"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -121,13 +146,26 @@ export const Auth: React.FC<AuthProps> = ({ onEnterOfflineMode }) => {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                正在登录...
+                {isLogin ? '正在登录...' : '正在注册...'}
               </>
             ) : (
-              '登录'
+              isLogin ? '登录' : '注册'
             )}
           </button>
         </form>
+
+        <div className="mt-6 text-center">
+          <button
+            type="button"
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setMessage(null);
+            }}
+            className="text-sm text-teal-600 hover:text-teal-700 font-medium transition-colors"
+          >
+            {isLogin ? '还没有账号？立即注册' : '已有账号？返回登录'}
+          </button>
+        </div>
 
         <div className="mt-8 pt-6 border-t border-slate-100 text-center">
           <p className="text-xs text-slate-400">
