@@ -152,7 +152,29 @@ airoi_forshare/
 
 ---
 
-## 🎉 最新更新 (v1.1.0)
+## 🎉 最新更新 (v1.1.1)
+
+### ✨ 功能改进
+
+- ✅ **邮件确认功能已修复**：正确配置 Site URL 和 Redirect URLs
+- ✅ **完整的用户注册流程**：注册 → 邮箱确认 → 登录
+- ✅ **专业的用户体验**：邮件确认链接正确指向生产环境
+
+### 📧 邮件确认配置（已完成）
+
+**配置详情**：
+- ✅ Site URL: `https://airoiforshare.vercel.app`
+- ✅ Redirect URLs: 已配置生产域名允许回调
+- ✅ 邮件确认：已启用
+- ✅ 用户注册流程完整可用
+
+详细配置记录请参考：
+- [PLAN_A_EMAIL_CONFIRMATION.md](PLAN_A_EMAIL_CONFIRMATION.md) - 完整配置方案
+- [SUPABASE_AUTH_CONFIG.md](SUPABASE_AUTH_CONFIG.md) - 配置指南
+
+---
+
+## v1.1.0
 
 ### ✨ 新增功能
 
@@ -166,27 +188,6 @@ airoi_forshare/
 - ✅ 修复 Supabase 环境变量注入问题（之前包含 "N" 和换行符）
 - ✅ 修复 Gemini API 初始化错误（无 API Key 时优雅降级）
 - ✅ 修复 Vite 构建时的环境变量暴露问题
-
-### ⚠️ 已知问题
-
-#### 📧 邮件确认链接问题
-
-**问题描述**：
-- Supabase 邮件确认链接默认指向 `localhost:3000`
-- 生产环境应指向 `https://airoiforshare.vercel.app`
-
-**临时方案（已实施）**：
-- ✅ 在 Supabase Dashboard 中禁用了邮件确认
-- ✅ 用户注册后立即可以登录，无需确认邮件
-
-**永久方案（计划中）**：
-- ⏳ 在 Supabase 设置中配置正确的 Site URL
-- ⏳ 配置 Redirect URLs 允许生产域名
-- ⏳ 重新启用邮件确认功能
-
-详细说明请参考：
-- [SUPABASE_AUTH_CONFIG.md](SUPABASE_AUTH_CONFIG.md)
-- [TODO.md](TODO.md) - 查看优化任务进度
 
 ---
 

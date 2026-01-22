@@ -4,6 +4,41 @@
 
 ---
 
+## [1.1.1] - 2026-01-22
+
+### ✨ 功能改进
+
+#### 邮件确认功能配置完成
+- **完成**：Supabase Site URL 配置为生产域名
+- **完成**：Redirect URLs 配置允许生产环境回调
+- **完成**：邮件确认功能已启用并测试通过
+- **结果**：用户注册后可收到确认邮件，点击链接可成功验证
+
+### 📝 配置记录
+
+**Supabase 配置**：
+- Site URL: `https://airoiforshare.vercel.app`
+- Redirect URLs:
+  - `https://airoiforshare.vercel.app/**`
+  - `https://airoiforshare.vercel.app/auth/callback`
+- 邮件确认：已启用
+- 邮件模板：使用默认模板
+
+**测试验证**：
+- ✅ 注册新账号收到确认邮件
+- ✅ 邮件链接指向正确的生产域名
+- ✅ 点击链接成功完成邮箱验证
+- ✅ 验证后可以正常登录
+
+### 📚 文档更新
+
+- **更新**：`README.md` - 标记邮件确认问题已解决
+- **更新**：`CHANGELOG.md` - 添加 v1.1.1 发布记录
+- **更新**：`TODO.md` - 标记邮件确认任务为已完成
+- **参考**：`PLAN_A_EMAIL_CONFIRMATION.md` - 完整配置方案
+
+---
+
 ## [1.1.0] - 2026-01-22
 
 ### 🎉 新增功能

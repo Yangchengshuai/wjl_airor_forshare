@@ -16,39 +16,41 @@
 
 ### 1. Supabase 邮件确认配置优化
 
-**状态**：⏳ 待完成
+**状态**：✅ 已完成 (2026-01-22)
 
 **问题描述**：
-- 当前邮件确认链接指向 `localhost:3000`，生产环境无法使用
-- 已临时禁用邮件确认功能
+- ~~当前邮件确认链接指向 `localhost:3000`，生产环境无法使用~~
+- ~~已临时禁用邮件确认功能~~
 
-**任务清单**：
-- [ ] 在 Supabase Dashboard 中配置 Site URL
+**完成任务清单**：
+- [x] 在 Supabase Dashboard 中配置 Site URL
   ```
   当前值：http://localhost:3000
   修改为：https://airoiforshare.vercel.app
   ```
-- [ ] 配置 Redirect URLs
+- [x] 配置 Redirect URLs
   ```
   添加：https://airoiforshare.vercel.app/**
   添加：https://airoiforshare.vercel.app/auth/callback
   ```
-- [ ] 重新启用邮件确认功能
+- [x] 重新启用邮件确认功能
   ```
   Enable email confirmations: ON
   Allow testing (disable email): OFF
   ```
-- [ ] 测试邮件确认流程（端到端测试）
-- [ ] 更新文档说明配置步骤
+- [x] 测试邮件确认流程（端到端测试）
+- [x] 更新文档说明配置步骤
 
-**预期收益**：
+**实施结果**：
 - ✅ 提高安全性（防止虚假邮箱注册）
 - ✅ 专业的用户体验
 - ✅ 符合生产环境最佳实践
+- ✅ 完整的注册 → 邮箱确认 → 登录流程
 
-**预计时间**：15 分钟
-
-**相关文档**：`SUPABASE_AUTH_CONFIG.md`
+**相关文档**：
+- `SUPABASE_AUTH_CONFIG.md` - 配置指南
+- `PLAN_A_EMAIL_CONFIRMATION.md` - 完整实施方案
+- `CHANGELOG.md` - v1.1.1 发布记录
 
 ---
 
@@ -290,20 +292,20 @@
 
 ## 📊 任务统计
 
-| 优先级 | 待完成 | 总计 |
-|--------|--------|------|
-| 🔴 高优先级 | 2 | 2 |
-| 🟡 中优先级 | 4 | 4 |
-| 🟢 低优先级 | 6 | 6 |
-| **合计** | **12** | **12** |
+| 优先级 | 待完成 | 已完成 | 总计 |
+|--------|--------|--------|------|
+| 🔴 高优先级 | 1 | 1 | 2 |
+| 🟡 中优先级 | 4 | 0 | 4 |
+| 🟢 低优先级 | 6 | 0 | 6 |
+| **合计** | **11** | **1** | **12** |
 
 ---
 
 ## 🎯 建议的实施顺序
 
 ### 第一阶段（本周）
-1. ✅ Supabase 邮件确认配置优化
-2. ✅ 安装 Tailwind CSS（替代 CDN）
+1. ✅ Supabase 邮件确认配置优化（已完成）
+2. ⏳ 安装 Tailwind CSS（替代 CDN）
 
 ### 第二阶段（下周）
 3. ⏳ Gemini API Key 安全加固
