@@ -26,15 +26,15 @@ const getApiKey = () => {
   return '';
 };
 
-// Initialize with a safe key (empty string if missing) to prevent startup crash.
-// Calls will fail gracefully inside the function if key is invalid.
-const ai = new GoogleGenAI({ apiKey: getApiKey() });
-
 export const getAIAnalysis = async (inputs: ProjectInputs, results: CalculationResult): Promise<string> => {
   const apiKey = getApiKey();
   if (!apiKey) {
-    return "API Key 未配置。请在 Vercel 环境变量中设置 VITE_API_KEY (推荐) 或 API_KEY。";
+    return "⚠️ AI 分析功能需要配置 Gemini API Key。\n\n当前功能：\n✅ ROI 计算（离线可用）\n✅ 数据保存到 Supabase\n\n要启用 AI 分析，请在环境变量中配置 GEMINI_API_KEY。";
   }
+
+  // Initialize GoogleGenAI only when API key is available
+  const ai = new GoogleGenAI({ apiKey });
+
 
   const prompt = `
     你是一位高级 AI 投资顾问兼业务线“CFO”（当前支持公司的HR业务线）。今天，公司的HR+AI创新业务团队，承报了如下项目规划数据，请基于以下最新的财务模型分析该 AI 项目提案：
